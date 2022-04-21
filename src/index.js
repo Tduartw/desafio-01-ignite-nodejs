@@ -58,6 +58,10 @@ app.post("/users", (request, response) => {
   return response.status(201).json(user);
 });
 
+app.get("/users", (request, response) => {
+  return response.json(users);
+});
+
 app.get("/todos", checksExistsUserAccount, (request, response) => {
   const { user } = request;
   const userTodoList = user.todos.map((todo) => todo);
@@ -109,16 +113,25 @@ app.patch(
   (request, response) => {
     const { user, todoIndex } = request;
 
-
-    user.todos[todoIndex].done = !user.todos[todoIndex].done 
-
+    user.todos[todoIndex].done = !user.todos[todoIndex].done;
 
     return response.status(200).json(user.todos[todoIndex]);
   }
 );
 
-app.delete("/todos/:id", checksExistsUserAccount, (request, response) => {
-  // Complete aqui
-});
+app.delete(
+  "/todos/:id",
+  checksExistsUserAccount,
+  checksTodoExists,
+  (request, response) => {
+    const { user, todoIndex } = request;
+
+    user.todos.splice(user.todos[todoIndex], 1); 
+
+    return response.status(204).json(user.todos);
+  }
+);
+
+
 
 module.exports = app;
